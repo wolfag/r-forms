@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled, { createGlobalStyle, css } from 'styled-components';
 
 const GlobalStyle = createGlobalStyle`
@@ -90,32 +90,96 @@ const StyledError = styled.div`
   margin: 0 0 40px 0;
 `;
 
+const initState = {
+  name: '',
+  email: '',
+  gender: '',
+  message: '',
+};
+
 function App() {
+  const [state, setState] = useState(initState);
+  const [error, setError] = useState('');
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    for (let key in state) {
+      if (state[key] === '') {
+        setError(`You must provide the ${key}`);
+        return;
+      }
+    }
+    setError('');
+
+    // const regex = /^\w+([-+.'])*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/;
+    // const test = regex.test(state.email);
+  };
+
+  const handleInput = (e) => {
+    const input = e.currentTarget.name;
+    const value = e.currentTarget.value;
+
+    setState((prev) => ({
+      ...prev,
+      [input]: value,
+    }));
+  };
+
   return (
     <>
       <GlobalStyle />
       <StyledFormWrapper>
-        <StyledForm>
+        <StyledForm onSubmit={handleSubmit}>
           <h2>Contact Form</h2>
           <label htmlFor='name'>Name</label>
-          <StyledInput type='text' name='name' />
+          <StyledInput
+            type='text'
+            name='name'
+            value={state.name}
+            onChange={handleInput}
+          />
           <label htmlFor='email'>Email</label>
-          <StyledInput type='email' name='email' />
+          <StyledInput
+            type='email'
+            name='email'
+            value={state.email}
+            onChange={handleInput}
+          />
           <StyledFieldset>
             <legend>Gender</legend>
             <label>
-              <input type='radio' value='female' name='gender' /> Female
+              <input
+                type='radio'
+                value='female'
+                name='gender'
+                checked={state.gender === 'female'}
+                onChange={handleInput}
+              />{' '}
+              Female
             </label>
             <label>
-              <input type='radio' value='male' name='gender' /> Male
+              <input
+                type='radio'
+                value='male'
+                name='gender'
+                checked={state.gender === 'male'}
+                onChange={handleInput}
+              />{' '}
+              Male
             </label>
-            <label htmlFor='message'>Message</label>
-            <StyledTextArea name='message' />
-            <StyledError>
-              <p>Error message here</p>
-            </StyledError>
-            <StyledButton type='submit'>Send</StyledButton>
           </StyledFieldset>
+          <label htmlFor='message'>Message</label>
+          <StyledTextArea
+            name='message'
+            value={state.message}
+            onChange={handleInput}
+          />
+          {error && (
+            <StyledError>
+              <p>{error}</p>
+            </StyledError>
+          )}
+          <StyledButton type='submit'>Send</StyledButton>
         </StyledForm>
       </StyledFormWrapper>
     </>
